@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — Download Professional Architectural Files</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Premium Marketplace</div>
+    <h1 style="font-size:clamp(28px,4vw,44px);">Download Professional Architectural Files</h1>
+    <p style="max-width:560px;">Complete CAD packages, high-resolution renders and full drawing sets — instant demo download after a simulated checkout.</p>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+    <div class="filter-bar">
+      <select id="sort-by">
+        <option value="popular">Sort: Popular</option>
+        <option value="newest">Sort: Newest</option>
+        <option value="cheapest">Sort: Cheapest</option>
+        <option value="downloaded">Sort: Most Downloaded</option>
+      </select>
+    </div>
+    <div class="project-grid" id="market-grid"></div>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("marketplace.html");
+renderFooter();
+renderFloatingCTA();
+
+const sellable = PROJECTS.filter(p=>!p.notDownloadable);
+
+function render(sortKey){
+  let list = [...sellable];
+  if(sortKey==="cheapest") list.sort((a,b)=>(a.price||0)-(b.price||0));
+  else if(sortKey==="downloaded") list.sort((a,b)=>b.analytics.downloads-a.analytics.downloads);
+  else if(sortKey==="newest") list.reverse();
+  else list.sort((a,b)=>b.analytics.views-a.analytics.views);
+
+  document.getElementById("market-grid").innerHTML = list.map(p=>`
+    <div class="project-card">
+      <a href="project.html?slug=${p.slug}" style="display:contents;color:inherit;">
+        <div class="pc-media"><span class="sheet-no">${p.id}</span><span class="label-pill">${p.projectLabel}</span></div>
+      </a>
+      <div class="pc-body">
+        <div class="pc-cat">${p.category} · ${p.plotSize}</div>
+        <a href="project.html?slug=${p.slug}"><div class="pc-title">${p.title}</div></a>
+        <div class="pc-tags">${(p.drawings[0]?.types||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <div style="font-size:11.5px;color:var(--ink-soft);" class="mono">★ 4.${(p.id.slice(-1))||8} rating · ${p.analytics.downloads.toLocaleString()} downloads</div>
+        <div class="pc-foot">
+          <span class="pc-price ${p.price===0?'free':''}">${p.price===0?"Free":"$"+p.price.toFixed(2)}</span>
+          <button class="btn btn-primary btn-sm" onclick="${p.price===0?`startFreeDownload('${p.slug}')`:`startPremiumCheckout('${p.slug}')`}">${p.price===0?"Download":"Buy Now"}</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+render("popular");
+document.getElementById("sort-by").addEventListener("change", e=>render(e.target.value));
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Project — Awais Architect</title>
+<meta id="meta-desc" name="description" content="">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div id="project-root"></div>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("projects.html");
+renderFooter();
+
+const slug = new URLSearchParams(location.search).get("slug") || PROJECTS[0].slug;
+const p = findProject(slug) || PROJECTS[0];
+
+document.title = `${p.title} — Awais Architect`;
+document.getElementById("page-title").textContent = p.seo.title;
+document.getElementById("meta-desc").setAttribute("content", p.seo.description);
+
+function priceBlock(){
+  if(p.notDownloadable){
+    return `<div class="notice-band">
+      <span>🔒</span>
+      <span>This is client-specific work displayed for portfolio purposes only. Not every portfolio project is available for download — downloadable resources are limited to projects and assets authorized for distribution.</span>
+    </div>`;
+  }
+  return "";
+}
+
+function heroButtons(){
+  if(p.notDownloadable){
+    return `<a class="btn btn-outline" onclick="startFreeDownload('${p.slug}')">View Portfolio Preview</a>
+            <a class="btn btn-primary" href="contact.html">Request Custom Design</a>`;
+  }
+  const freeBtn = `<a class="btn btn-outline" onclick="startFreeDownload('${p.slug}')">Download Free Preview</a>`;
+  const buyBtn = p.price === 0
+    ? `<a class="btn btn-primary" onclick="startFreeDownload('${p.slug}')">Download Full File (Free)</a>`
+    : `<a class="btn btn-primary" onclick="startPremiumCheckout('${p.slug}')">Get Complete Files — $${p.price.toFixed(2)}</a>`;
+  return `${freeBtn}${buyBtn}<a class="btn btn-ghost" href="contact.html">Request Custom Design</a>`;
+}
+
+function relatedProjects(){
+  return PROJECTS.filter(x=>x.slug!==p.slug && (x.category===p.category || x.style===p.style)).slice(0,4);
+}
+
+document.getElementById("project-root").innerHTML = `
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow"><a href="projects.html" style="color:inherit;">Projects</a> / ${p.category} / ${p.id}</div>
+    <div class="two-col">
+      <div>
+        <h1 style="font-size:clamp(28px,4vw,42px);">${p.title}</h1>
+        <p style="max-width:560px;">${p.description}</p>
+        <div class="pc-tags" style="margin-bottom:20px;">
+          ${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+          <span class="tag" style="border-color:var(--blueprint);color:var(--blueprint);">${p.projectLabel}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+        <button class="btn btn-ghost btn-sm" onclick="toggleFavorite('${p.slug}', this)">♡ Save</button>
+        <div class="dim-rule mono" style="width:100%;">views ${p.analytics.views.toLocaleString()} · downloads ${p.analytics.downloads.toLocaleString()}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:18px;">
+  <div class="wrap">
+    <div class="hero-figure crosshair" style="aspect-ratio:16/8;margin-bottom:24px;">
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:12px;">
+        HERO RENDER · ${p.title} · Sheet ${p.id}
+      </div>
+    </div>
+    <div class="hero-actions" style="margin-bottom:10px;">${heroButtons()}</div>
+    ${priceBlock()}
+  </div>
+</section>
+
+<section>
+  <div class="wrap two-col">
+    <div>
+      <div class="eyebrow">Project Gallery</div>
+      <h2 style="font-size:26px;">Drawings, Renders & Interiors</h2>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:20px;">
+        <div class="eyebrow">TikTok Project</div>
+        <p style="font-size:13.5px;">▶ ${p.tiktok.views} views · ❤ ${p.tiktok.likes} likes</p>
+        <a href="${PROFILE.tiktokUrl}" target="_blank" rel="noopener" class="btn btn-outline btn-sm btn-block">Watch Video</a>
+        <a href="${PROFILE.tiktokUrl}" target="_blank" rel="noopener" class="btn btn-primary btn-sm btn-block" style="margin-top:8px;">Follow @awais.architect</a>
+      </div>
+      <div id="ad-sidebar"></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="eyebrow">Project Information</div>
+    <h2 style="font-size:26px;">Project Specifications</h2>
+    <div class="panel">
+      <div class="spec-list">
+        <div><span>Project Type</span><b>${p.category}</b></div>
+        <div><span>Plot Size</span><b>${p.plotSize}</b></div>
+        <div><span>Floors</span><b>${p.floors ?? "—"}</b></div>
+        <div><span>Bedrooms</span><b>${p.bedrooms ?? "—"}</b></div>
+        <div><span>Bathrooms</span><b>${p.bathrooms ?? "—"}</b></div>
+        <div><span>Kitchen(s)</span><b>${p.kitchens ?? "—"}</b></div>
+        <div><span>Living Areas</span><b>${p.livingAreas ?? "—"}</b></div>
+        <div><span>Parking</span><b>${p.parking ?? "—"}</b></div>
+        <div><span>Style</span><b>${p.style}</b></div>
+        <div><span>Status</span><b>${p.status}</b></div>
+      </div>
+      <p style="font-size:11.5px;margin-top:14px;margin-bottom:0;">All specifications shown are demo data for this prototype.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Project Drawing Set</div>
+    <h2 style="font-size:26px;">Available Drawings</h2>
+    <div class="project-grid" id="drawing-grid"></div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Free vs Premium</div>
+        <h2 style="font-size:26px;">Choose Your Download</h2>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="panel">
+        <h3 style="font-size:19px;">Free Preview</h3>
+        <ul style="font-size:13.5px;color:var(--ink-soft);padding-left:18px;">
+          ${p.freeIncludes.map(f=>`<li>${f}</li>`).join("")}
+        </ul>
+        <button class="btn btn-outline btn-block" onclick="startFreeDownload('${p.slug}')">Download Free Preview</button>
+      </div>
+      <div class="panel" style="border-color:var(--brass);">
+        <h3 style="font-size:19px;">Complete CAD Package</h3>
+        ${p.premiumIncludes.length ? `
+          <ul style="font-size:13.5px;color:var(--ink-soft);padding-left:18px;">
+            ${p.premiumIncludes.map(f=>`<li>${f}</li>`).join("")}
+          </ul>
+          <div class="pc-price" style="font-size:22px;margin:10px 0;">${p.price===0?"Free":"$"+p.price.toFixed(2)}</div>
+          <button class="btn btn-brass btn-block" onclick="startPremiumCheckout('${p.slug}')">Buy & Download</button>
+        ` : `<p style="font-size:13.5px;">Not available for public download. Client-specific work is shown for portfolio purposes only.</p>`}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">Want This Design for Your Plot?</div>
+    <h2 style="font-size:30px;">Have a similar plot? Request a customized version of this design.</h2>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="contact.html" class="btn btn-primary">Request Custom Design</a>
+      <a href="contact.html" class="btn btn-outline">Get a Quote</a>
+      <a href="#" class="btn btn-wa">Contact on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2);border-top:1px solid var(--line);">
+  <div class="wrap"><div id="ad-above-related"></div></div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Discover More</div>
+        <h2 style="font-size:26px;">Similar Projects</h2>
+      </div>
+    </div>
+    <div class="project-grid" id="related-grid"></div>
+  </div>
+</section>
+`;
+
+document.getElementById("gallery-grid").innerHTML = p.gallery.map((g,i)=>`
+  <div class="gallery-item" onclick="openLightbox(${JSON.stringify(p.gallery)}, ${i})">
+    <div class="g-label">${g}</div>
+  </div>
+`).join("");
+
+document.getElementById("drawing-grid").innerHTML = p.drawings.map(d=>`
+  <div class="project-card" style="flex-direction:row;align-items:center;padding:16px;gap:14px;">
+    <div style="flex:1;">
+      <div class="pc-title" style="font-size:15.5px;">${d.name}</div>
+      <div class="pc-tags" style="margin-top:6px;">${d.types.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:6px;" class="mono">${d.size}</div>
+    </div>
+  </div>
+`).join("") || `<p>Drawing set not published for this portfolio project.</p>`;
+
+document.getElementById("ad-sidebar").innerHTML = adSlot("ADVERTISEMENT — Sidebar","tall");
+document.getElementById("ad-above-related").innerHTML = adSlot("ADVERTISEMENT — Above Related Projects","wide");
+
+function projectCard(pr){
+  const priceHtml = pr.price === 0 ? `<span class="pc-price free">Free</span>`
+    : pr.price === null ? `<span class="pc-price" style="font-size:13px;color:var(--ink-soft);">Portfolio Only</span>`
+    : `<span class="pc-price">$${pr.price.toFixed(2)}</span>`;
+  return `
+  <a href="project.html?slug=${pr.slug}" class="project-card">
+    <div class="pc-media"><span class="sheet-no">${pr.id}</span><span class="label-pill">${pr.projectLabel}</span></div>
+    <div class="pc-body">
+      <div class="pc-cat">${pr.category} · ${pr.plotSize}</div>
+      <div class="pc-title">${pr.title}</div>
+      <div class="pc-foot">${priceHtml}<span class="btn btn-ghost btn-sm">View Project</span></div>
+    </div>
+  </a>`;
+}
+document.getElementById("related-grid").innerHTML = relatedProjects().map(projectCard).join("") || "<p>No related projects yet.</p>";
+renderFloatingCTA();
+</script>
+</body>
+</html>

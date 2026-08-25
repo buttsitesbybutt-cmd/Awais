@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & Request a Custom Design — Awais Architect</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Request Custom Design</div>
+    <h1 style="font-size:clamp(28px,4vw,44px);max-width:640px;">Have a Plot? Let's Design For It.</h1>
+    <p style="max-width:560px;">Tell us about your plot and requirements — this is a demo submission form; no request is actually sent or stored beyond this session.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap two-col">
+    <div class="panel">
+      <form id="lead-form" onsubmit="submitLeadForm(event,'Custom Design Request')">
+        <div class="form-grid">
+          <div class="field"><label>Name</label><input required name="name" type="text" placeholder="Your full name"></div>
+          <div class="field"><label>Email</label><input required name="email" type="email" placeholder="you@example.com"></div>
+          <div class="field"><label>WhatsApp</label><input name="whatsapp" type="text" placeholder="+92 ..."></div>
+          <div class="field"><label>City</label><input name="city" type="text" placeholder="City"></div>
+          <div class="field"><label>Plot Size</label>
+            <select name="plotSize">
+              <option value="">Select plot size</option>
+              ${["2 Marla","3 Marla","5 Marla","7 Marla","8 Marla","10 Marla","1 Kanal","1.5 Kanal","Other"].map(v=>`<option>${v}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field"><label>Number of Floors</label>
+            <select name="floors"><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4+</option></select>
+          </div>
+          <div class="field"><label>Required Rooms</label><input name="rooms" type="text" placeholder="e.g. 4 bedrooms, 1 study"></div>
+          <div class="field"><label>Project Type</label>
+            <select name="projectType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Interior</option><option>Renovation</option></select>
+          </div>
+          <div class="field full"><label>Message</label><textarea name="message" rows="4" placeholder="Describe your requirements…"></textarea></div>
+          <div class="field full"><label>Upload Plot / Document (optional)</label><div class="file-drop">Drag a file here or click to upload (demo — not stored)</div></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px;">Submit Request (Demo)</button>
+        <p class="form-success" style="display:none;color:var(--blueprint);font-size:13.5px;margin-top:10px;">✓ Received — this demo form doesn't send real messages.</p>
+      </form>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:20px;">
+        <div class="eyebrow">Direct Contact (Demo)</div>
+        <p style="font-size:14px;"><b>Email:</b> <span id="c-email"></span></p>
+        <p style="font-size:14px;"><b>WhatsApp:</b> <span id="c-wa"></span></p>
+        <p style="font-size:14px;"><b>TikTok:</b> <a href="https://www.tiktok.com/@awais.architect" target="_blank" rel="noopener">@awais.architect</a></p>
+        <a class="btn btn-wa btn-block" href="#">Message on WhatsApp</a>
+      </div>
+      <div id="ad-contact"></div>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("contact.html");
+renderFooter();
+renderFloatingCTA();
+document.getElementById("c-email").textContent = PROFILE.email;
+document.getElementById("c-wa").textContent = PROFILE.whatsapp;
+document.getElementById("ad-contact").innerHTML = adSlot("ADVERTISEMENT","tall");
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — Awais Architect</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">What Muhammad Awais Offers</div>
+    <h1 style="font-size:clamp(28px,4vw,44px);max-width:700px;">From First Sketch to Finished Walkthrough</h1>
+    <p style="max-width:560px;">Architectural design and visualization services for residential and commercial projects — request a quote for any service below.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="project-grid" id="services-grid"></div>
+  </div>
+</section>
+
+<section style="background:var(--ink);color:var(--paper);">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;">
+    <div>
+      <div class="eyebrow" style="color:var(--brass);">Custom Work</div>
+      <h2 style="color:var(--paper);font-size:28px;">Have a plot and a rough idea? Let's shape it into a design.</h2>
+    </div>
+    <a href="contact.html" class="btn btn-brass">Request a Quote</a>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("services.html");
+renderFooter();
+renderFloatingCTA();
+
+const SERVICES = [
+  ["Architectural Design","Residential and commercial concepts developed from plot dimensions and brief."],
+  ["2D CAD Drawings","Detailed architectural drafting — floor plans, elevations, sections and schedules."],
+  ["3D Visualization","Photorealistic architectural visualization for interiors and exteriors."],
+  ["Front Elevation","Modern and contemporary facades tailored to plot width and orientation."],
+  ["Interior Design","Interior concepts and visualization, room by room."],
+  ["Exterior Design","Complete exterior visualization including landscaping context."],
+  ["Architectural Animation","Animated walkthroughs and presentation videos."],
+  ["Custom House Design","Fully customized architectural solutions based on plot requirements."]
+];
+
+document.getElementById("services-grid").innerHTML = SERVICES.map(([title,desc])=>`
+  <div class="project-card">
+    <div class="pc-body" style="padding:22px;">
+      <div class="pc-title">${title}</div>
+      <p style="font-size:13.5px;">${desc}</p>
+      <div class="pc-foot" style="border-top:none;padding-top:0;gap:8px;">
+        <a href="contact.html" class="btn btn-outline btn-sm">Request Quote</a>
+        <a href="projects.html" class="btn btn-ghost btn-sm">View Examples</a>
+      </div>
+    </div>
+  </div>
+`).join("");
+</script>
+</body>
+</html>

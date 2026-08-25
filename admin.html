@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard (Demo) — Awais Architect</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Admin <span class="demo-badge">Demo Data</span></div>
+    <h1 style="font-size:clamp(26px,3.6vw,38px);">Studio Dashboard</h1>
+    <p style="max-width:600px;">All figures below — traffic, downloads, orders, leads and revenue — are demo data for this prototype and do not reflect real earnings or activity.</p>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">Dashboard</div>
+      <div class="tab" data-tab="projects">Projects</div>
+      <div class="tab" data-tab="downloads">Downloads</div>
+      <div class="tab" data-tab="orders">Orders</div>
+      <div class="tab" data-tab="leads">Leads</div>
+      <div class="tab" data-tab="analytics">Analytics</div>
+      <div class="tab" data-tab="revenue">Revenue</div>
+    </div>
+    <div id="admin-content"></div>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("admin.html");
+renderFooter();
+
+const totalDownloads = PROJECTS.reduce((s,p)=>s+p.analytics.downloads,0) + RUNTIME.downloadLog.length;
+const totalViews = PROJECTS.reduce((s,p)=>s+p.analytics.views,0);
+const premiumSales = 214; // demo baseline
+const mostPopular = [...PROJECTS].sort((a,b)=>b.analytics.views-a.analytics.views).slice(0,5);
+
+function kpi(num,label){
+  return `<div class="kpi-card"><div class="kpi-num">${num}</div><div class="kpi-lbl">${label}</div></div>`;
+}
+
+function barChart(items, valueKey, max){
+  return `<div style="display:flex;flex-direction:column;gap:10px;">
+    ${items.map(it=>`
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>${it.label}</span><span class="mono">${it.value.toLocaleString()}</span></div>
+        <div style="background:var(--paper-2);height:8px;border-radius:4px;overflow:hidden;">
+          <div style="width:${Math.max(4,(it.value/max)*100)}%;height:100%;background:var(--brass);"></div>
+        </div>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function renderAdmin(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===tab));
+  const el = document.getElementById("admin-content");
+
+  if(tab === "overview"){
+    el.innerHTML = `
+      <div class="kpi-grid" style="margin-bottom:26px;">
+        ${kpi(PROJECTS.length, "Total Projects")}
+        ${kpi(totalViews.toLocaleString(), "Total Visitors (Views)")}
+        ${kpi(totalDownloads.toLocaleString(), "Total Downloads")}
+        ${kpi(premiumSales, "Premium Sales")}
+      </div>
+      <div class="kpi-grid" style="margin-bottom:26px;">
+        ${kpi("$"+REVENUE_DEMO.advertising, "Estimated Ad Revenue")}
+        ${kpi("$"+REVENUE_DEMO.total.toLocaleString(), "Total Revenue")}
+        ${kpi("42%", "TikTok Referral Share")}
+        ${kpi(RUNTIME.leads.length, "New Leads (This Session)")}
+      </div>
+      <div class="panel">
+        <h3 style="font-size:17px;">Most Popular Projects (by Views)</h3>
+        ${barChart(mostPopular.map(p=>({label:p.title, value:p.analytics.views})), mostPopular[0].analytics.views)}
+      </div>
+    `;
+  }
+
+  if(tab === "projects"){
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <p style="margin:0;font-size:13.5px;">${PROJECTS.length} projects in the library</p>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Demo only — add project form would open here')">+ Add Project</button>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Sheet</th><th>Title</th><th>Category</th><th>Price</th><th>Status</th><th>Views</th><th>Downloads</th><th></th></tr></thead>
+        <tbody>
+          ${PROJECTS.map(p=>`
+            <tr>
+              <td class="mono">${p.id}</td>
+              <td>${p.title}</td>
+              <td>${p.category}</td>
+              <td>${p.price===0?"Free":p.price===null?"—":"$"+p.price.toFixed(2)}</td>
+              <td><span class="status-pill ${p.price===0?'free':p.price===null?'pending':'paid'}">${p.status}</span></td>
+              <td>${p.analytics.views.toLocaleString()}</td>
+              <td>${p.analytics.downloads.toLocaleString()}</td>
+              <td><a href="project.html?slug=${p.slug}" class="btn btn-ghost btn-sm">View</a></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  if(tab === "downloads"){
+    const rows = RUNTIME.downloadLog.map(d=>({...d, title: findProject(d.slug)?.title || d.slug}));
+    el.innerHTML = `
+      <table class="admin-table">
+        <thead><tr><th>File</th><th>Project</th><th>Type</th><th>User</th><th>Date</th></tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(r=>`
+            <tr><td>Preview Package</td><td>${r.title}</td><td><span class="status-pill ${r.type==='free'?'free':'paid'}">${r.type}</span></td><td>demo-user</td><td>${new Date(r.at).toLocaleString()}</td></tr>
+          `).join("") : `<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:30px;">No downloads logged this session yet — try downloading a free preview from a project page.</td></tr>`}
+        </tbody>
+      </table>
+    `;
+  }
+
+  if(tab === "orders"){
+    el.innerHTML = `
+      <table class="admin-table">
+        <thead><tr><th>Order ID</th><th>Project</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          ${RUNTIME.orders.length ? RUNTIME.orders.map(o=>`
+            <tr><td class="mono">${o.id}</td><td>${findProject(o.slug)?.title||o.slug}</td><td>demo-user</td><td>$${o.amount?.toFixed(2)}</td><td><span class="status-pill paid">${o.status}</span></td><td>${new Date(o.at).toLocaleString()}</td></tr>
+          `).join("") : `<tr><td colspan="6" style="text-align:center;color:var(--ink-soft);padding:30px;">No orders logged this session yet — try the demo checkout on a project page.</td></tr>`}
+        </tbody>
+      </table>
+    `;
+  }
+
+  if(tab === "leads"){
+    el.innerHTML = `
+      <table class="admin-table">
+        <thead><tr><th>Name</th><th>WhatsApp</th><th>Email</th><th>Plot Size</th><th>Message</th><th>Date</th></tr></thead>
+        <tbody>
+          ${RUNTIME.leads.length ? RUNTIME.leads.map(l=>`
+            <tr><td>${l.name||"—"}</td><td>${l.whatsapp||"—"}</td><td>${l.email||"—"}</td><td>${l.plotSize||"—"}</td><td>${(l.message||"").slice(0,40)}</td><td>${new Date(l.createdAt).toLocaleString()}</td></tr>
+          `).join("") : `<tr><td colspan="6" style="text-align:center;color:var(--ink-soft);padding:30px;">No leads yet — submit the contact form to see it appear here.</td></tr>`}
+        </tbody>
+      </table>
+    `;
+  }
+
+  if(tab === "analytics"){
+    el.innerHTML = `
+      <div class="two-col">
+        <div class="panel">
+          <h3 style="font-size:17px;">Views by Project</h3>
+          ${barChart(mostPopular.map(p=>({label:p.title, value:p.analytics.views})), mostPopular[0].analytics.views)}
+        </div>
+        <div class="panel">
+          <h3 style="font-size:17px;">Traffic Sources <span class="demo-badge">Demo</span></h3>
+          ${barChart([
+            {label:"TikTok Referrals", value:42},
+            {label:"Direct / Search", value:31},
+            {label:"Instagram", value:14},
+            {label:"Other Social", value:13}
+          ], 42)}
+        </div>
+      </div>
+    `;
+  }
+
+  if(tab === "revenue"){
+    el.innerHTML = `
+      <div class="notice-band" style="margin-bottom:20px;">
+        <span>ⓘ</span><span>DEMO DATA — figures below are illustrative only and do not represent actual earnings.</span>
+      </div>
+      <div class="kpi-grid">
+        ${kpi("$"+REVENUE_DEMO.digitalDownloads.toLocaleString(), "Digital Downloads")}
+        ${kpi("$"+REVENUE_DEMO.advertising.toLocaleString(), "Advertising")}
+        ${kpi("$"+REVENUE_DEMO.customProjects.toLocaleString(), "Custom Projects")}
+        ${kpi("$"+REVENUE_DEMO.total.toLocaleString(), "Total")}
+      </div>
+    `;
+  }
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click", ()=>renderAdmin(t.dataset.tab)));
+renderAdmin("overview");
+</script>
+</body>
+</html>

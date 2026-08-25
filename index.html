@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awais Architect — Architecture You Can Explore. Designs You Can Download.</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">@awais.architect · Architectural Design & Visualization</div>
+      <h1>Architecture You Can Explore. Designs You Can Download.</h1>
+      <p class="lede">Explore architectural projects, detailed drawings, 3D visualizations and downloadable design resources from Muhammad Awais.</p>
+      <div class="hero-actions">
+        <a href="projects.html" class="btn btn-primary">Explore Projects</a>
+        <a href="https://www.tiktok.com/@awais.architect" target="_blank" rel="noopener" class="btn btn-outline">View TikTok</a>
+      </div>
+      <div class="trust-strip">2D · 3D · Elevation · Interior · Exterior · Animation</div>
+    </div>
+    <div class="hero-figure crosshair">
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;padding:20px;">
+        FEATURED RENDER<br>Modern 5 Marla Residence<br>Front Elevation — A-01
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">From TikTok to Full Projects</div>
+        <h2>Every short video hides a complete project.</h2>
+        <p>The website expands the architectural content shown on TikTok into full drawing sets, specifications and downloadable resources — figures below reflect example/publicly indexed performance for one featured video.</p>
+      </div>
+      <a href="projects.html" class="btn btn-outline">See Every Project</a>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">35K+</div><div class="lbl">TikTok Followers</div></div>
+      <div class="stat-card"><div class="num">3.1M+</div><div class="lbl">Views (example video)</div></div>
+      <div class="stat-card"><div class="num">104K+</div><div class="lbl">Likes (example video)</div></div>
+      <div class="stat-card"><div class="num">21K+</div><div class="lbl">Saves</div></div>
+      <div class="stat-card"><div class="num">7K+</div><div class="lbl">Shares</div></div>
+    </div>
+    <p class="stat-note">Example TikTok performance, based on publicly indexed information for one video. Not a live or verified statistic feed.</p>
+  </div>
+</section>
+
+<section style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Seen on TikTok. Explore the Complete Project.</div>
+        <h2>Every project can go beyond a short video.</h2>
+        <p>Explore the drawings, dimensions, renders, specifications and downloadable resources behind the design.</p>
+      </div>
+    </div>
+    <div id="tiktok-cards" class="project-grid"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Project Library</div>
+        <h2>Featured Projects</h2>
+        <p>Residential, commercial, interior and elevation concepts — original work and portfolio pieces, clearly labeled.</p>
+      </div>
+      <a href="projects.html" class="btn btn-outline">Browse All Projects</a>
+    </div>
+    <div id="featured-grid" class="project-grid"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div id="ad-home-1"></div>
+  </div>
+</section>
+
+<section style="background:var(--ink);color:var(--paper);">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;">
+    <div style="max-width:520px;">
+      <div class="eyebrow" style="color:var(--brass);">Want This Design for Your Plot?</div>
+      <h2 style="color:var(--paper);">Have a similar plot? Request a customized version of this design.</h2>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="contact.html" class="btn btn-brass">Request Custom Design</a>
+      <a href="contact.html" class="btn btn-outline" style="border-color:var(--paper);color:var(--paper);">Get a Quote</a>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("index.html");
+renderFooter();
+renderFloatingCTA();
+document.getElementById("ad-home-1").innerHTML = adSlot("ADVERTISEMENT","wide");
+
+function projectCard(p){
+  const priceHtml = p.price === 0 ? `<span class="pc-price free">Free</span>`
+    : p.price === null ? `<span class="pc-price" style="font-size:13px;color:var(--ink-soft);">Portfolio Only</span>`
+    : `<span class="pc-price">$${p.price.toFixed(2)}</span>`;
+  return `
+  <a href="project.html?slug=${p.slug}" class="project-card">
+    <div class="pc-media">
+      <span class="sheet-no">${p.id}</span>
+      <span class="label-pill">${p.projectLabel}</span>
+    </div>
+    <div class="pc-body">
+      <div class="pc-cat">${p.category} · ${p.plotSize}</div>
+      <div class="pc-title">${p.title}</div>
+      <p style="font-size:13.5px;margin:0;">${p.description}</p>
+      <div class="pc-tags">${p.tags.slice(0,3).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+      <div class="pc-foot">
+        ${priceHtml}
+        <span class="btn btn-ghost btn-sm">View Project</span>
+      </div>
+    </div>
+  </a>`;
+}
+
+document.getElementById("featured-grid").innerHTML = PROJECTS.slice(0,8).map(projectCard).join("");
+
+document.getElementById("tiktok-cards").innerHTML = PROJECTS.slice(0,4).map(p=>`
+  <div class="tiktok-card">
+    <div class="tt-media">
+      <span class="tt-tag mono">▶ TikTok Clip · ${p.id}</span>
+    </div>
+    <div class="tt-body">
+      <div style="font-family:'Fraunces',serif;font-size:17px;">${p.title}</div>
+      <p style="color:#C9C6BA;font-size:13px;margin:0;">${p.style} residential design</p>
+      <div class="tt-stats">
+        <span>👁 ${p.tiktok.views}</span>
+        <span>❤ ${p.tiktok.likes}</span>
+      </div>
+      <a href="project.html?slug=${p.slug}" class="btn btn-brass btn-sm" style="margin-top:8px;">Explore Project</a>
+    </div>
+  </div>
+`).join("");
+</script>
+</body>
+</html>

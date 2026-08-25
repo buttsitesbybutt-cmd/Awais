@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Awais Architect</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Account <span class="demo-badge">Demo — Session Only</span></div>
+    <h1 style="font-size:clamp(26px,3.6vw,38px);">My Account</h1>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+    <div class="tabs">
+      <div class="tab active" data-tab="downloads">My Downloads</div>
+      <div class="tab" data-tab="purchases">My Purchases</div>
+      <div class="tab" data-tab="favorites">Favorites</div>
+      <div class="tab" data-tab="profile">Profile</div>
+    </div>
+    <div id="tab-content"></div>
+  </div>
+</section>
+
+<footer id="site-footer"></footer>
+<div id="floating-cta-slot"></div>
+<div class="mobile-bottom-nav" id="mobile-bottom-nav"></div>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+renderHeader("account.html");
+renderFooter();
+renderFloatingCTA();
+
+function renderTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===tab));
+  const el = document.getElementById("tab-content");
+
+  if(tab === "downloads"){
+    const rows = RUNTIME.downloadLog.map(d=>findProject(d.slug)?{...d, title:findProject(d.slug).title}:null).filter(Boolean);
+    el.innerHTML = rows.length ? `
+      <table class="admin-table"><thead><tr><th>Project</th><th>Type</th><th>Date</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r.title}</td><td>${r.type}</td><td>${new Date(r.at).toLocaleString()}</td></tr>`).join("")}</tbody></table>
+    ` : `<div class="center-empty"><h3>No downloads yet</h3><p>Download a free preview from any project page to see it appear here.</p><a href="projects.html" class="btn btn-outline">Browse Projects</a></div>`;
+  }
+
+  if(tab === "purchases"){
+    el.innerHTML = RUNTIME.orders.length ? `
+      <table class="admin-table"><thead><tr><th>Order</th><th>Project</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>${RUNTIME.orders.map(o=>`<tr><td>${o.id}</td><td>${findProject(o.slug)?.title||o.slug}</td><td>$${o.amount?.toFixed(2)}</td><td><span class="status-pill paid">${o.status}</span></td></tr>`).join("")}</tbody></table>
+    ` : `<div class="center-empty"><h3>No purchases yet</h3><p>Buy a complete project package to see it appear here.</p><a href="marketplace.html" class="btn btn-outline">Browse Marketplace</a></div>`;
+  }
+
+  if(tab === "favorites"){
+    const favs = [...RUNTIME.favorites].map(findProject).filter(Boolean);
+    el.innerHTML = favs.length ? `<div class="project-grid">${favs.map(p=>`
+      <a class="project-card" href="project.html?slug=${p.slug}">
+        <div class="pc-media"><span class="sheet-no">${p.id}</span></div>
+        <div class="pc-body"><div class="pc-title">${p.title}</div></div>
+      </a>`).join("")}</div>` : `<div class="center-empty"><h3>No favorites yet</h3><p>Tap "Save" on any project to add it here.</p><a href="projects.html" class="btn btn-outline">Browse Projects</a></div>`;
+  }
+
+  if(tab === "profile"){
+    el.innerHTML = `<div class="panel" style="max-width:480px;">
+      <div class="form-grid">
+        <div class="field"><label>Name</label><input type="text" placeholder="Your name"></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="showToast('Profile saved (demo)')">Save Profile</button>
+    </div>`;
+  }
+}
+
+document.querySelectorAll(".tab").forEach(t=> t.addEventListener("click", ()=>renderTab(t.dataset.tab)));
+renderTab("downloads");
+</script>
+</body>
+</html>
